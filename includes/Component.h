@@ -61,19 +61,17 @@ namespace UIF{
 					return component;
 				}
 
-			//TO FIX/FINISH!!!
+			//Clone usable in next frame... 
 			template<typename T>
 				static T* Clone(UIF::Component* component){
 					T* clone = new T(component); 	
-					UIF::Data::global_bus->Add_ComponentLine(clone);	
-					if(clone->children.empty()){
-						return clone;
-					}
+					UIF::Data::global_bus->Add_ComponentLine(clone);
 
 					//Construct new Component for every child.
 					for(int idx{}; idx < clone->children.size(); idx++){
 						clone->children[idx] = Clone<T>(clone->children[idx]);		
 					}
+					return clone;
 				}
 
 			//Would be static if didn't require 'this', slightly awkward call site.
