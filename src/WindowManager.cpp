@@ -3,7 +3,7 @@
 UIF::Window* UIF::WindowManager::Create(const std::string& t, int w, int h, int flag){
 	Window* window = new Window(CVec_ID++, t, w, h, flag);
 	if(!window->Is_Init()){
-		//Maintain symmetry... i.e. Window 1 -> CVec_ID 1. Avoid CVec_ID = 2... But Vec only has 1 element.
+		//Maintain symmetry...
 		if(CVec_ID != 0){
 			CVec_ID--;
 		}
@@ -15,7 +15,7 @@ UIF::Window* UIF::WindowManager::Create(const std::string& t, int w, int h, int 
 
 void UIF::WindowManager::Create_Window(const std::string& title, int w, int h, int flag){	
 	UIF::Window* Window = Create(title, w, h, flag);
-	if(!Window){ //Simply terminate, no exception.
+	if(!Window){ //Simply terminate, no exception. Consider another course of action? Why bother to maintain symmetry?
 		quit = true;
 		return;
 	}
@@ -32,13 +32,11 @@ void UIF::WindowManager::Create_Window(const std::string& title, int w, int h, i
 	this->focus_window = Window;
 }
 
-//Add a component to the target window specified. Log Error.
+//Add a component to the target window specified.
 void UIF::WindowManager::Add_Component(UIF::Component* component, const std::string& window){
 	this->component_vec[Query_Title(window)->Get_CVec_ID()].emplace_back(component);
 }
-                  
-/*Searches for component in associated Component container of the target window specified.
-  Deletes component if found. Does nothing otherwise.*/
+
 void UIF::WindowManager::Remove_Component(UIF::Component* component, const std::string& window){
 	UIF::ContainerTargetEraseAndDelete(component_vec[Query_Title(window)->Get_CVec_ID()], component);
 }
@@ -53,14 +51,12 @@ UIF::Window* UIF::WindowManager::Query_Title(const std::string& window){
 	return nullptr;
 }
 
-//De-allocates resources from the Window that requested closure. i.e. Focus Window.
 void UIF::WindowManager::Delete_Window(){
 	//Avert double free on 2+ clicks... 
 	if(!this->focus_window){ 
 		return;
 	}
 	SDL_HideWindow(this->focus_window->Get_Window());
-
 	//De-alloc Windows components
 	UIF::ContainerEraseAndDeleteAll(this->component_vec[this->focus_window->Get_CVec_ID()]);				
         //Remove from windows vector.	
@@ -70,8 +66,6 @@ void UIF::WindowManager::Delete_Window(){
 	}
 	Query_Highest_Priority(); //Set a new focus window
 }
-
-
 
 void UIF::WindowManager::Update(){
 	this->helper_mgr.Update();
@@ -86,7 +80,6 @@ void UIF::WindowManager::Render(){
 	}
 }
 
- /* Dispatch routes inputs to each window. Calls a check for any component hits.*/
 void UIF::WindowManager::Dispatch(){
 	while(SDL_PollEvent(&this->event)){
 		switch(this->event.type){
@@ -140,7 +133,6 @@ void UIF::WindowManager::Dispatch(){
 
 }
 
-//Returns pointer to window by title.
 UIF::Window* UIF::WindowManager::operator[](const std::string& window){
 	return Query_Title(window);
 }
@@ -168,7 +160,6 @@ void UIF::WindowManager::Query_ID(SDL_WindowID id){
 	}
 }
 	                 
-//Check for a component hit after window is deduced.
 void UIF::WindowManager::Interact_Window(UIF::Invoker invoker){ 
 	focus_window->Set_Priority(SDL_GetTicks());
 	for(auto* component : this->component_vec[focus_window->Get_CVec_ID()]){
@@ -181,7 +172,7 @@ void UIF::WindowManager::Component_Event(UIF::Component* component, UIF::Invoker
  	 //Force a Hit on all Components on RESIZE.
 	if(invoker == UIF::Invoker::RESIZE){
 		for(auto* component : component_vec[focus_window->Get_CVec_ID()]){
-			this->helper_mgr.Invoke(component, focus_window, invoker); //Fix this to a loop iterating over all window components.
+			this->helper_mgr.Invoke(component, focus_window, invoker); 	
 		}
 		return;
 	 }
@@ -219,7 +210,6 @@ void UIF::WindowManager::Run(){
 	while(true){
 		start_ticks = SDL_GetTicks();
 		Dispatch();
-		//Window deletion carried out by dispatch can render all Window*s nullptr.
 		if(quit){
 			break;
 		}
