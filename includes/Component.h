@@ -73,10 +73,11 @@ namespace UIF{
 				}
 
 			//Would be static if didn't require 'this', slightly awkward call site.
-			UIF::Component* Query_Hit(UIF::Component* component);
+			static void Render(UIF::Window* window, UIF::Component* component);
 			static void Delete(UIF::Component* component);
+			UIF::Component* Query_Hit(UIF::Component* component);	
 			virtual void Update(UIF::Window* window) = 0; //Update Layout/Geometry
-			virtual void Render(UIF::Window* window);
+		
 
 			UIF::Component* Add_Helper(const std::string& helper, UIF::Invoker invoker);
 			UIF::Component* Remove_Helper(const std::string& helper, UIF::Invoker invoker);

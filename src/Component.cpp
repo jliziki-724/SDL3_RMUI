@@ -46,23 +46,18 @@ UIF::Component::Component(UIF::Component* component){
 	UIF::Data::global_bus->Add_ComponentLine(this);
 }
 
-//TAKE ANOTHER LOOK AT THIS
 void UIF::Component::Delete(UIF::Component* component){
-	if(component->children.empty()){
-		delete component->cfrect.dst_frect;
-		delete component;
-		return;
-	}
-
 	for(auto* child : component->children){
 			Delete(child);
 	}
+	delete component->cfrect.dst_frect;
+	delete component;
 }
 
-void UIF::Component::Render(UIF::Window* window){
+//Another DFS... Render Component(Parent) first, then render the child, then Render the child's children... And so forth.
+void UIF::Component::Render(UIF::Window* window, UIF::Component* component){
 	SDL_Renderer* const cache_render { window->Get_Renderer() }; //Repeated calls to get the renderer per cycle are unideal.	
-	//Don't set the draw color if it hasn't changed.
-	auto color_cache = [](SDL_Color& last_color, const SDL_Color& RGBA){
+	auto cached = [](SDL_Color& last_color, const SDL_Color& RGBA){	//Don't set the draw color if it hasn't changed.
 		if(last_color.r != RGBA.r &&
 		   last_color.b != RGBA.b &&
 		   last_color.g != RGBA.g &&
@@ -74,31 +69,32 @@ void UIF::Component::Render(UIF::Window* window){
 		return true;
 	};
 
-	if(!this->TVec_ID){
-		if(!color_cache(last_color, this->cfrect.RGBA)){
-			SDL_SetRenderDrawColor(cache_render, this->cfrect.RGBA.r, this->cfrect.RGBA.g, this->cfrect.RGBA.b, this->cfrect.RGBA.a);	
+	auto render_cfrect = [&cached, &cache_render](SDL_Color& last_color, UIF::Component* component){
+		if(!cached(last_color, component->cfrect.RGBA)){
+			SDL_SetRenderDrawColor(cache_render, component->cfrect.RGBA.r, component->cfrect.RGBA.g, component->cfrect.RGBA.b, component->cfrect.RGBA.a);
 		}
 		SDL_RenderFillRect(cache_render, 
-				this->cfrect.dst_frect);
+				component->cfrect.dst_frect);
+	};
 
+
+	if(!component->TVec_ID){
+		render_cfrect(last_color, component);
 	}
 	else{
-		SDL_RenderTexture(cache_render, tex_cache->Get_Texture(this), &this->cfrect.src_frect, this->cfrect.dst_frect);
+		SDL_RenderTexture(cache_render, tex_cache->Get_Texture(component), &component->cfrect.src_frect, component->cfrect.dst_frect);
 	}
-	for(auto* child : this->children){
+	for(auto* child : component->children){	
 		if(child->Is_Active()){
 			if(!child->TVec_ID){
-				if(!color_cache(last_color, child->cfrect.RGBA)){
-					SDL_SetRenderDrawColor(cache_render, child->cfrect.RGBA.a, child->cfrect.RGBA.g,
-						child->cfrect.RGBA.b, child->cfrect.RGBA.a);
-				}
-				SDL_RenderFillRect(cache_render, 
-					child->cfrect.dst_frect);
+				render_cfrect(last_color, child);
+			
 			}
 			else{
 				SDL_RenderTexture(cache_render, tex_cache->Get_Texture(child), &child->cfrect.src_frect, child->cfrect.dst_frect); 
 			}
 		}
+		Render(window, child);
 	}
 }
 
