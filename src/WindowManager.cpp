@@ -56,7 +56,7 @@ UIF::Window* UIF::WindowManager::Query_Title(const std::string& window){
 //De-allocates resources from the Window that requested closure. i.e. Focus Window.
 void UIF::WindowManager::Delete_Window(){
 	//Avert double free on 2+ clicks... 
-	if(!Query_Title(this->focus_window->Get_Title())){ 
+	if(!this->focus_window){ 
 		return;
 	}
 	SDL_HideWindow(this->focus_window->Get_Window());
