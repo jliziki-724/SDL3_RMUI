@@ -13,9 +13,6 @@ SDL_Texture* UIF::TextureCache::Get_Texture(UIF::Component* component){
 	return this->textures[component->Get_TVec_ID()];
 }
 
-/* Does nothing on failure. 
- * Asset based Components will be deleted on failure of texture creati:/on no need to consider safety here
- * as it is done further downstream.*/
 void UIF::TextureCache::Add_Texture(const std::string& filepath, UIF::Window* window, UIF::Component* component){
 	//Texture hasn't already been loaded.
 	if(!this->redirect_lookup[filepath]){
@@ -42,9 +39,4 @@ void UIF::TextureCache::Add_Texture(const std::string& filepath, UIF::Window* wi
 	else{
 		component->Set_TVec_ID(redirect_lookup[filepath]);
 	}
-}
-
-//A copied Component calls this to link itself to the Texture of the Component it is copying.
-void UIF::TextureCache::Link_To_Texture(UIF::Component* lhs, UIF::Component* rhs){
-	lhs->Set_TVec_ID(rhs->Get_TVec_ID());	
 }

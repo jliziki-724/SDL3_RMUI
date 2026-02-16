@@ -13,8 +13,7 @@ namespace UIF{
 
 		public:	
 		
-		void Add_Texture(const std::string& filepath, UIF::Window* window, UIF::Component* component);
-		void Link_To_Texture(UIF::Component* lhs, UIF::Component* rhs); 	
+		void Add_Texture(const std::string& filepath, UIF::Window* window, UIF::Component* component);	
 		SDL_Texture* Get_Texture(UIF::Component* component);
 
 		TextureCache() = default;

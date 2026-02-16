@@ -44,11 +44,11 @@ namespace UIF{
 			Component(const Component&) = delete; 
 			Component& operator=(const Component&) = delete;
 		public:	
-			virtual ~Component();
+			virtual ~Component() = default;
 
 			template <typename T>
 				static T* Create(const std::string& filepath, UIF::Window* window, float x = 0.0f, float y = 0.0f, 
-						 float w = 0.0f, float h = 0.0f){
+						 float w = 1.0f, float h = 1.0f){
 					T* component = new T(filepath, window, x, y, w, h);
 					//Component can be invalid, if and only if it is expressly desired to be asset based.
 				        if(!filepath.empty()){
@@ -65,18 +65,21 @@ namespace UIF{
 			//Clone usable in next frame... 
 			template<typename T>
 				static T* Clone(UIF::Component* component){
-					T* clone = new T(component); 
-				
-					UIF::Data::global_bus->Add_ComponentLine(clone);
-						
-					for(int idx{}; idx < clone->children.size(); idx++){
-						clone->children[idx] = Clone<T>(component->children[idx]);
-						UIF::Data::global_bus->Add_ComponentLine(clone->children[idx]);
+					T* clone = new T(component); 	
+					UIF::Data::global_bus->Add_ComponentLine(clone);	
+					if(clone->children.empty()){
+						return clone;
 					}
-					return clone;
+
+					//Construct new Component for every child.
+					for(int idx{}; idx < clone->children.size(); idx++){
+						clone->children[idx] = Clone<T>(clone->children[idx]);		
+					}
 				}
 
-			static UIF::Component* Query_Hit(UIF::Component* parent);
+			//Would be static if didn't require 'this', slightly awkward call site.
+			UIF::Component* Query_Hit(UIF::Component* component);
+			static void Delete(UIF::Component* component);
 			virtual void Update(UIF::Window* window) = 0; //Update Layout/Geometry
 			virtual void Render(UIF::Window* window);
 
@@ -90,12 +93,17 @@ namespace UIF{
 			void Mod_Src(float x, float y, float w, float h);
 			void Mod_Color(SDL_Color& RGBA, int16_t r, int16_t g, int16_t b);
 			void Mod_Opacity(SDL_Color& RGBA, int16_t a);
+			
+			void Link_To_Texture(UIF::Component* lhs, UIF::Component* rhs);
 
-			//Frequently accessed attributes.
+
+			//Frequently accessed attributes. Return by Copy instead...
 			const float& Get_Aspect();
 			const float& Get_WinRatio();
 			const ColoredFRect& Get_CFRect();
-				
+			
+			uint32_t Get_ID();
+
 			void Set_TVec_ID(uint32_t new_tvec_id);
 			uint32_t Get_TVec_ID();
 
@@ -185,7 +193,6 @@ namespace UIF{
 				}
 		};
 
-		//Consider making tabbar/sidebar/dropmenu specializations of a Bar type base class..
 		class SideBar : public Component{
 			private:
 				using Component::Component;
@@ -195,7 +202,6 @@ namespace UIF{
 		
 		};
 
-		//TO-DO, use a single x co-ordinate. Iterate through the vector, multiplying width per element.
 		class TabBar : public Component{
 			private:
 				using Component::Component;
@@ -224,8 +230,7 @@ namespace UIF{
 
 				void Add_Tab(){
 				}
-
-				//Adjust tab spacing as needed, etc...
+	
 				virtual void Update(UIF::Window* window) override{
 				}	
 

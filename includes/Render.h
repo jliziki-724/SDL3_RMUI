@@ -9,7 +9,8 @@ namespace UIF{
 	class Render{
 		private:
 			std::vector<std::vector<UIF::Component*>>& component_vec; //Implement spatial partitioning, etc. 
-		        std::unordered_map<UIF::Component*, float>checksums; //<- Associate Checksum to component rather than embed into type.									   
+		        std::vector<float>checksums;
+
 			float Make_Checksum(UIF::Component* component);
 			bool Comp_Checksum(UIF::Component* component);
 		

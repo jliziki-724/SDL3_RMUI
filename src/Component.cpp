@@ -9,16 +9,15 @@ UIF::Component::Component(const std::string& filepath, UIF::Window* window, floa
 		Mod_Dst(window, x, y, static_cast<float>(tex_cache->Get_Texture(this)->w), static_cast<float>(tex_cache->Get_Texture(this)->h));
 	}
 	else{	
-		Mod_Dst(window, x, y, w, h); //Mod_Dst disallows setting to 0. However, cfrect is defaulted by initialization to 0.
+		Mod_Dst(window, x, y, w, h); 
 	}
 
-	//Avoid division by 0.
-	if(this->cfrect.dst_frect->w >= 1|| this->cfrect.dst_frect->h >= 1){
-		this->aspect = this->cfrect.dst_frect->w / this->cfrect.dst_frect->h;
-		this->win_ratio = (this->cfrect.dst_frect->w * this->cfrect.dst_frect->h) / 
-			(static_cast<float>(window->Get_Dimensions().w) * static_cast<float>(window->Get_Dimensions().h)); // <- Capture the initial relative area for use as a Max/Min scaling constraint..
-	}
-			
+	this->aspect = this->cfrect.dst_frect->w / this->cfrect.dst_frect->h;
+	this->win_ratio = (this->cfrect.dst_frect->w * this->cfrect.dst_frect->h) / 
+		(static_cast<float>(window->Get_Dimensions().w) * static_cast<float>(window->Get_Dimensions().h)); // <- Capture the initial relative area for use as a Max/Min scaling constraint..
+	
+	
+	//Consider a 50% reduction rather than fit.
 	//If component is larger than the window. Fit to Window, recalculate the ratio which should now be 1:1.
 	if(this->win_ratio > 1){
 		Mod_Dst(window, this->cfrect.dst_frect->x, this->cfrect.dst_frect->y, 
@@ -28,11 +27,11 @@ UIF::Component::Component(const std::string& filepath, UIF::Window* window, floa
 		this->win_ratio = (this->cfrect.dst_frect->w * this->cfrect.dst_frect->h) / 
 			(static_cast<float>(window->Get_Dimensions().w) * static_cast<float>(window->Get_Dimensions().h));
 	}
-	this->children.reserve(Data::default_reserve);
+	this->children.reserve(UIF::Data::default_reserve);
 }
 
 UIF::Component::Component(UIF::Component* component){
-	this->cfrect = component->cfrect;
+	this->cfrect = component->cfrect; 
 	this->cfrect.dst_frect = new SDL_FRect{ component->cfrect.dst_frect->x,
 						component->cfrect.dst_frect->y,
 						component->cfrect.dst_frect->w,
@@ -47,19 +46,22 @@ UIF::Component::Component(UIF::Component* component){
 	this->win_ratio = component->win_ratio;
 }
 
-UIF::Component::~Component(){
-	for(auto* child : this->children){
-		delete child->cfrect.dst_frect;
+void UIF::Component::Delete(UIF::Component* component){
+	if(component->children.empty()){
+		delete component->cfrect.dst_frect;
+		delete component;
+		return;
 	}
-	UIF::ContainerEraseAndDeleteAll(this->children); 
-	delete this->cfrect.dst_frect;
+
+	for(auto* child : component->children){
+			Delete(child);
+	}
 }
 
-//Most Cryptic Code? 
 void UIF::Component::Render(UIF::Window* window){
 	SDL_Renderer* const cache_render { window->Get_Renderer() }; //Repeated calls to get the renderer per cycle are unideal.	
 	//Don't set the draw color if it hasn't changed.
-	static auto color_cache = [](SDL_Color& last_color, const SDL_Color& RGBA){
+	auto color_cache = [](SDL_Color& last_color, const SDL_Color& RGBA){
 		if(last_color.r != RGBA.r &&
 		   last_color.b != RGBA.b &&
 		   last_color.g != RGBA.g &&
@@ -101,7 +103,6 @@ void UIF::Component::Render(UIF::Window* window){
 
 //Depth First Search. If Component hit, check children... And so forth for all hit components until nullptr returned (no children), then return the child with no children.
 UIF::Component* UIF::Component::Query_Hit(UIF::Component* component){
-
 	auto hit_test = [](UIF::Component* component){
  		float m_x{};
   		float m_y{};
@@ -127,8 +128,12 @@ UIF::Component* UIF::Component::Query_Hit(UIF::Component* component){
 			}
 		}
 	}
+
+	//No children hit, hit parent.
+	return this;
 }
 
+//Consider FRect sources?
 void UIF::Component::Mod_Src(float x, float y, float w, float h){
 	if(x < 0 || x > tex_cache->Get_Texture(this)->w ||
 	   y < 0 || y > tex_cache->Get_Texture(this)->h ||
@@ -177,6 +182,10 @@ void UIF::Component::Mod_Opacity(SDL_Color& RGBA, int16_t a){
 	RGBA.a = static_cast<uint8_t>(a);	
 }
 
+void UIF::Component::Link_To_Texture(UIF::Component* lhs, UIF::Component* rhs){
+	lhs->Set_TVec_ID(rhs->Get_TVec_ID());
+}
+
 void UIF::Component::Set_TVec_ID(uint32_t new_tvec_id){
 	this->TVec_ID = new_tvec_id;
 }
@@ -191,6 +200,10 @@ void UIF::Component::Set_Active(bool new_active){
 
 bool UIF::Component::Is_Active(){
 	return this->is_active;
+}
+
+uint32_t UIF::Component::Get_ID(){
+	return this->ID;
 }
 
 uint32_t UIF::Component::Get_TVec_ID(){
@@ -218,6 +231,10 @@ bool UIF::Component::State_Valid(){
 	if(!tex_cache->Get_Texture(this)){
 		return false;
 	}
+	else if(!tex_cache->Get_Texture(this)->w || !tex_cache->Get_Texture(this)->h){ //Guard for 0x1/0x0 Textures... Will cause crashes on division from aspect ratio/win_ratio.
+		return false;
+	}
+
 	return true;
 }
 

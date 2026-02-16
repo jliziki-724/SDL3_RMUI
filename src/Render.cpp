@@ -3,8 +3,8 @@
 
 UIF::Render::Render(std::vector<std::vector<UIF::Component*>>& c_vec) 
 	: component_vec(c_vec) {
+		checksums.reserve(UIF::Data::default_reserve);
 }
-
 
 void UIF::Render::Update_Active(UIF::Window* window){
 }
@@ -27,7 +27,7 @@ float UIF::Render::Make_Checksum(UIF::Component* component){
 }
 
 bool UIF::Render::Comp_Checksum(UIF::Component* component){
-	if(Make_Checksum(component) != this->checksums[component]){
+	if(Make_Checksum(component) != this->checksums[component->Get_ID()]){
 		return false;
 	}
 	return true;
