@@ -11,11 +11,10 @@ namespace UIF{
 	struct ColoredFRect{
 		SDL_FRect* dst_frect { new SDL_FRect{ 0.0f, 0.0f, 0.0f, 0.0f} };
 		SDL_FRect src_frect {};
-		SDL_Color RGBA{ 25, 50, 100, SDL_ALPHA_OPAQUE };
+		SDL_Color RGBA{ 0, 0, 0, SDL_ALPHA_OPAQUE };
 	};
 
-	//Consider Naming Components.
-	//Intended to support hybrid-composition
+	//Consider Naming Components?
 	class Component{
 		protected:
 			inline static SDL_Color last_color{}; // <- Lazy cache. Not Thread Safe. However, rendering is single threaded.
