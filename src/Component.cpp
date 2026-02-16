@@ -46,6 +46,7 @@ UIF::Component::Component(UIF::Component* component){
 	this->win_ratio = component->win_ratio;
 }
 
+//TAKE ANOTHER LOOK AT THIS...
 void UIF::Component::Delete(UIF::Component* component){
 	if(component->children.empty()){
 		delete component->cfrect.dst_frect;
