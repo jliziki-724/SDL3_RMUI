@@ -137,7 +137,6 @@ UIF::Window* UIF::WindowManager::operator[](const std::string& window){
 	return Query_Title(window);
 }
 
-//Assigns focus window with the highest priority window
 void UIF::WindowManager::Query_Highest_Priority(){
 	uint64_t max{};
 	for(auto* window : this->windows){
@@ -148,9 +147,8 @@ void UIF::WindowManager::Query_Highest_Priority(){
 	}
 }
 
-//Assigns focus_window with the window with the matching id.
-/*Will cause a seg fault if a window - one created by the process - that is not registered by the WindowManager is clicked,
- * as focus_window will become nullptr.*/
+
+/*Will cause a seg fault if a window - one created by the process - that is not registered by the WindowManager is clicked, as focus_window will become nullptr.*/
 void UIF::WindowManager::Query_ID(SDL_WindowID id){
 	for(auto* window : this->windows){
 		if(window->Get_ID() == id){
