@@ -209,13 +209,13 @@ namespace UIF{
 
 			public:
 				void Init(UIF::Window* window, float x, float y, float w, float h){
-					auto calc_space = [this, x, w](){
+					static auto calc_space = [this, &x, w](){
 						int counter{};
 
 						if(!counter){
 							return x;
 						}
-						return (x + (++counter * w)) + 1;
+						return (++x + (++counter * w));
 					};
 
 					for(auto* child : children){
