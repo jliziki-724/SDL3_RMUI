@@ -43,6 +43,8 @@ UIF::Component::Component(UIF::Component* component){
 
 	this->aspect = component->aspect;
 	this->win_ratio = component->win_ratio;
+
+	UIF::Data::global_bus->Add_ComponentLine(this);
 }
 
 //TAKE ANOTHER LOOK AT THIS...
