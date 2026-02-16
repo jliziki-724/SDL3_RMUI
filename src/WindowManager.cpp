@@ -84,31 +84,31 @@ void UIF::WindowManager::Dispatch(){
 	while(SDL_PollEvent(&this->event)){
 		switch(this->event.type){
 			case SDL_EVENT_MOUSE_BUTTON_UP:
-				Query_ID(event.button.windowID); 
+				Query_ID(this->event.button.windowID); 
 				Interact_Window(UIF::Invoker::CLICK);
 				break;
 
 			case SDL_EVENT_MOUSE_BUTTON_DOWN:
-				Query_ID(event.button.windowID);
+				Query_ID(this->event.button.windowID);
 				Interact_Window(UIF::Invoker::LONG_CLICK);
 				break;
 
 			case SDL_EVENT_MOUSE_MOTION:
-				Query_ID(event.window.windowID); 
+				Query_ID(this->event.window.windowID); 
 				break;
 
 			case SDL_EVENT_WINDOW_RESIZED:
-				Query_ID(event.window.windowID);
-				focus_window->Update_Dimensions();
+				Query_ID(this->event.window.windowID);
+				this->focus_window->Update_Dimensions();
 				Interact_Window(UIF::Invoker::RESIZE);
 				break;
 			
 			case SDL_EVENT_WINDOW_RESTORED:
-				Query_ID(event.window.windowID);
+				Query_ID(this->event.window.windowID);
 				break;
 
 			case SDL_EVENT_WINDOW_MAXIMIZED:
-				Query_ID(event.window.windowID);
+				Query_ID(this->event.window.windowID);
 				Interact_Window(UIF::Invoker::RESIZE);
 				break;
 
@@ -117,13 +117,13 @@ void UIF::WindowManager::Dispatch(){
 				break;
 
 			case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
-				Query_ID(event.window.windowID);
+				Query_ID(this->event.window.windowID);
 				Delete_Window();
 				break;
 
 
 			case SDL_EVENT_QUIT:
-				quit = true;
+				this->quit = true;
 				break;
 
 			default:
@@ -210,7 +210,7 @@ void UIF::WindowManager::Run(){
 	while(true){
 		start_ticks = SDL_GetTicks();
 		Dispatch();
-		if(quit){
+		if(this->quit){
 			break;
 		}
 		Update();
