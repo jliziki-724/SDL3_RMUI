@@ -28,13 +28,12 @@ namespace UIF{
 		std::array<std::vector<UIF::Helper*>, static_cast<long unsigned int>(UIF::Invoker::INVOKER_COUNT)> arr_vec;
 	};
 
-
 	class HelperManager{
 		private: 
 			std::vector<ArrOfVec> helper_vec;
 	
 			//Helper Lookup/List of Helpers 
-			std::unordered_map<std::string, Helper*>lookup_helpers;
+			std::unordered_map<std::string_view, Helper*>lookup_helpers;
 
 			//File I/O Helper
 			UIF::LoadHelper load_helper { "load", lookup_helpers };
@@ -69,7 +68,7 @@ namespace UIF{
 
 			UIF::Data::NotificationBus notifications;
  
-			HelperManager() = default;
+			HelperManager();
 			~HelperManager() = default;
 
 			void Update();

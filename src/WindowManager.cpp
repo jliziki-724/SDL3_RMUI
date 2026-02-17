@@ -11,7 +11,7 @@ UIF::Window* UIF::WindowManager::Create(const std::string& t, int w, int h, int 
 
 void UIF::WindowManager::Create_Window(const std::string& title, int w, int h, int flag){	
 	UIF::Window* Window = Create(title, w, h, flag);
-	if(!Window){ //Simply terminate, no exception. 
+	if(!Window){ //Simply terminate, no exception.  
 		quit = true;
 		return;
 	}
@@ -20,8 +20,7 @@ void UIF::WindowManager::Create_Window(const std::string& title, int w, int h, i
 	this->windows.emplace_back(Window);
 
 	//Window->Components
-	std::vector<UIF::Component*> c;
-	this->component_vec.emplace_back(c);
+	this->component_vec.emplace_back(std::vector<UIF::Component*>{});
 
 	//ID(title)->Window
 	this->focus_window = Window;

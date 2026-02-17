@@ -8,7 +8,7 @@ namespace UIF
 {
 	class Helper{
 		protected:
-		 	Helper(const std::string& helper, std::unordered_map<std::string, Helper*>& helpers){ 
+		 	Helper(std::string_view helper, std::unordered_map<std::string_view, Helper*>& helpers){ 
 				helpers[helper] = this;
 			}
 		public:

@@ -1,6 +1,10 @@
 #include "HelperManager.h"
 #include "Component.h"
 
+UIF::HelperManager::HelperManager(){
+	helper_vec.reserve(UIF::Data::default_reserve);
+}
+
 void UIF::HelperManager::Invoke(UIF::Component* component, UIF::Window* window, UIF::Invoker invoker){
 	for(auto* helper : this->helper_vec[component->Get_HVec_ID()].arr_vec[static_cast<long unsigned int>(invoker)]){
 	helper->Execute(component, window);

@@ -1,9 +1,9 @@
 #ifndef UIFCORE_H
 #define UIFCORE_H
 
+#include <string_view>
 #include <array>
 #include <typeinfo>
-#include <memory>
 #include <limits>
 #include <cmath>
 #include <unordered_map>

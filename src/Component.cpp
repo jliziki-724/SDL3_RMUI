@@ -70,7 +70,7 @@ void UIF::Component::Render(UIF::Window* window, UIF::Component* component){
 		return true;
 	};
 
-	static auto render_cfrect = [&cached, &cache_render](SDL_Color& last_color, UIF::Component* component){
+	static auto render_cfrect = [cached, cache_render](SDL_Color& last_color, UIF::Component* component){
 		if(!cached(last_color, component->cfrect.RGBA)){
 			SDL_SetRenderDrawColor(cache_render, component->cfrect.RGBA.r, component->cfrect.RGBA.g, component->cfrect.RGBA.b, component->cfrect.RGBA.a);
 		}
