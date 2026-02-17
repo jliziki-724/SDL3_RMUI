@@ -8,25 +8,21 @@ namespace UIF{
 	class TextureCache{
 		private:
 			std::unordered_map<std::string, uint32_t> redirect_lookup; /*Check if the image data has already been loaded based on filepath.*/
-		
-		static constexpr uint32_t DUMMY_TEXTURE{ 1 };
-		SDL_Texture* dummy_texture{ nullptr };
-		std::vector<SDL_Texture*> textures { nullptr, dummy_texture }; //Insert one elemnt to reserve index 0 as sentinel i.e. 0 = 'No Texture',
+	
+		std::vector<SDL_Texture*> textures { nullptr }; //Insert one elemnt to reserve index 0 as sentinel i.e. 0 = 'No Texture',
 									       //1 = 'Texture Creation Failure' <- Component is intended to be asset based.
 
 
 		public:	
+			static constexpr uint32_t NO_TEXTURE{ 0 };
 		
-		void Add_Texture(const std::string& filepath, UIF::Window* window, UIF::Component* component);	
-		SDL_Texture* Get_Texture(UIF::Component* component);
-		
-		bool Needs_RendererForDummy();
-		void Make_Dummy(SDL_Renderer* renderer);
+			bool Add_Texture(const std::string& filepath, UIF::Window* window, UIF::Component* component);	
+			SDL_Texture* Get_Texture(UIF::Component* component);
 
-		TextureCache() = default;
-	        ~TextureCache();
-		TextureCache(const TextureCache&) = delete;
-		TextureCache& operator=(const TextureCache&) = delete;
+			TextureCache() = default;
+	        	~TextureCache();
+			TextureCache(const TextureCache&) = delete;
+			TextureCache& operator=(const TextureCache&) = delete;
 	};
 };
 

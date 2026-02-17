@@ -35,7 +35,6 @@ namespace UIF{
 			float win_ratio{};
 		
 			bool is_active{ true };
-			bool State_Valid();	
 
 			Component(Component* component);
 			Component(const std::string& filepath, UIF::Window* window, float x, float y, float w, float h); //Image based Components
@@ -44,18 +43,11 @@ namespace UIF{
 		public:	
 			virtual ~Component() = default;
 
+			//Failures not checked as failure defaults the Component to FRect based rather than Asset, opportunities to reload can Textures occur later.
 			template <typename T>
 				static T* Create(const std::string& filepath, UIF::Window* window, float x = 0.0f, float y = 0.0f, 
 						 float w = 1.0f, float h = 1.0f){
 					T* component = new T(filepath, window, x, y, w, h);
-					//Component can be invalid, if and only if it is expressly desired to be asset based.
-				        if(!filepath.empty()){
-						if(!component->State_Valid()){
-							delete component;
-							return nullptr;
-						}
-					}
-
 					UIF::Data::global_bus->Add_ComponentLine(component); // <- Put in Bus to be allocated invokers and helpers.	
 					return component;
 				}

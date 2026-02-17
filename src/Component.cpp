@@ -3,12 +3,12 @@
 
 //BASE CLASS - DEFINITIONS
 UIF::Component::Component(const std::string& filepath, UIF::Window* window, float x, float y, float w, float h){
-	if(!filepath.empty()){
-		tex_cache->Add_Texture(filepath, window, this);
+	//On failure to load asset, the Component is treated as FRect. i.e. Renders as FRect instead.
+	if(tex_cache->Add_Texture(filepath, window, this)){
  		Mod_Src(0, 0, static_cast<float>(tex_cache->Get_Texture(this)->w), static_cast<float>(tex_cache->Get_Texture(this)->h));
 		Mod_Dst(window, x, y, static_cast<float>(tex_cache->Get_Texture(this)->w), static_cast<float>(tex_cache->Get_Texture(this)->h));
 	}
-	else{	
+	else{ 
 		Mod_Dst(window, x, y, w, h); 
 	}
 
@@ -79,14 +79,14 @@ void UIF::Component::Render(UIF::Window* window, UIF::Component* component){
 	};
 
 
-	if(!component->TVec_ID){
+	if(component->TVec_ID == UIF::TextureCache::NO_TEXTURE){
 		render_cfrect(last_color, component);
 	}
 	else{
 		SDL_RenderTexture(cache_render, tex_cache->Get_Texture(component), &component->cfrect.src_frect, component->cfrect.dst_frect);
 	}
 	for(auto* child : component->children){	
-		if(!child->TVec_ID){
+		if(child->TVec_ID == UIF::TextureCache::NO_TEXTURE){
 			render_cfrect(last_color, child);
 			
 		}
@@ -134,8 +134,8 @@ UIF::Component* UIF::Component::Query_Hit(UIF::Component* component){
 UIF::Component* UIF::Component::Mod_Src(float x, float y, float w, float h){
 	if(x < 0 || x > tex_cache->Get_Texture(this)->w ||
 	   y < 0 || y > tex_cache->Get_Texture(this)->h ||
-	   w < 1 || 
-	   h < 1 ){
+	   w < 1.0f || 
+	   h < 1.0f ){
 		return this;
 	}
 	this->cfrect.src_frect.x = x;
@@ -150,8 +150,8 @@ UIF::Component* UIF::Component::Mod_Src(float x, float y, float w, float h){
 UIF::Component* UIF::Component::Mod_Dst(UIF::Window* window, float x, float y, float w, float h){
 	if(x < 0 || x > window->Get_Dimensions().w ||
 	   y < 0 || y > window->Get_Dimensions().h ||
-	   w < 1 || 
-	   h < 1 ){
+	   w < 1.0f || 
+	   h < 1.0f ){
 		return this;
 	}
 	this->cfrect.dst_frect->x = x;
@@ -234,18 +234,6 @@ float UIF::Component::Get_WinRatio(){
 
 const std::vector<UIF::Component*>& UIF::Component::Get_Children(){
 	return this->children;
-}
-
-//Component can be invalid, if and only if it is expressly desired to be asset based.
-bool UIF::Component::State_Valid(){
-	if(!tex_cache->Get_Texture(this)){
-		return false;
-	}
-	else if(tex_cache->Get_Texture(this)->w < 1.0f|| tex_cache->Get_Texture(this)->h < 1.0f){ //Guard for 0x1/0x0 Textures... Will cause crashes on division from aspect ratio/win_ratio.
-		return false;
-	}
-
-	return true;
 }
 
 UIF::Component* UIF::Component::Add_Helper(UIF::HelperType helper_type, UIF::Invoker invoker){ 

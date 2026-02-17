@@ -29,8 +29,7 @@ namespace UIF{
 
 	class HelperManager{
 		private: 
-			std::vector<ArrOfVec> component_helper_vec;
-	
+			std::vector<ArrOfVec> component_helper_vec;	
 			//Helper Lookup/List of Helpers
 			std::array<UIF::Helper*, static_cast<long unsigned int>(UIF::HelperType::HELPER_COUNT)> helper_arr;
 			
