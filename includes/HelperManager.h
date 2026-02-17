@@ -6,8 +6,7 @@
 #include "NotificationBus.h" 
 
 /* HELPERS:
- * LoadHelper-> "load" <- Opens a file explorer, retrieves file contents.
- * DefaultHelper -> "default" <- No behaviour.
+ *  
  *
  *
  * */
@@ -47,7 +46,7 @@ namespace UIF{
 			//Text Input Helpers
 			UIF::DefaultHelper TextInputHelper { UIF::HelperType::TEXT_INPUT, helper_arr };
 
-			//Tooltip HelpersU
+			//Tooltip Helpers
 			UIF::ToolTipHelper tooltip_helper { UIF::HelperType::TOOLTIP, helper_arr };
 
 			//Move

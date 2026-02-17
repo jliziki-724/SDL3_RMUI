@@ -24,6 +24,12 @@ void UIF::WindowManager::Create_Window(const std::string& title, int w, int h, i
 
 	//ID(title)->Window
 	this->focus_window = Window;
+
+	//TextureCache/SDL requires that a renderer is used to create a texture.
+	//For TextureCache, it is to have a safe failure mode for failed asset loads.
+	//if(tex_cache->Needs_RendererForDummy()){
+	//	tex_cache->Make_Dummy(Window->Get_Renderer());
+//	}
 }
 
 //Add a component to the target window specified.
