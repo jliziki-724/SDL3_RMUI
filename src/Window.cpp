@@ -1,7 +1,7 @@
 #include "Window.h"
 
-UIF::Window::Window(uint32_t cvec_id, const std::string& t, int w, int h, int flag) : CVec_ID(cvec_id), title(t){
-	window = SDL_CreateWindow(t.c_str(), w, h, flag);
+UIF::Window::Window(uint32_t cvec_id, std::string_view t, int w, int h, int flag) : CVec_ID(cvec_id), title(static_cast<std::string>(t)){
+	window = SDL_CreateWindow(static_cast<std::string>(t).c_str() , w, h, flag);
 	if(!window){
 		SDL_Log("Failed to create window. SDL error%s\n", SDL_GetError());
 	}

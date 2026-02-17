@@ -111,11 +111,6 @@ UIF::Component* UIF::Component::Query_Hit(UIF::Component* component){
 		return false;
 	};
 
-	//Already confirmed to be hit, so just return.
-	if(component->children.empty()){
-		return component;
-	}
-
 	for(auto* child : component->children){
 		if(child->Is_Active()){
 			if(hit_test(child)){

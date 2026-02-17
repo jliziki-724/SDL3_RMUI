@@ -33,12 +33,12 @@ namespace UIF{
 		void Query_Highest_Priority();
 
  	public:
-		static Window* Create(const std::string& t, int w, int h, int flag);
+		static Window* Create(std::string_view t, int w, int h, int flag);
 
 		WindowManager() = default;
 		~WindowManager() = default; // <- Considered cleaning up abnormal terminations... However, OS reclaims resources anyways.
 
-		void Create_Window(const std::string& title, int w, int h, int flag = SDL_WINDOW_RESIZABLE);
+		void Create_Window(std::string_view title, int w, int h, int flag = SDL_WINDOW_RESIZABLE);
 		void Add_Component(UIF::Component* component, UIF::Window* window);  
 		void Remove_Component(UIF::Component* component, UIF::Window* window);
 		void Run();                

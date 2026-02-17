@@ -23,7 +23,7 @@ namespace UIF{
 		int frame_rate{ 60 };
 
 		const uint32_t CVec_ID{};
-		const std::string& title{};
+		std::string title{};
 
 		bool is_active{ true };
 		bool Is_Init() const;
@@ -33,7 +33,7 @@ namespace UIF{
 		void Set_Framerate(int new_Framerate);
 		void Update_Dimensions();
 
-		Window(uint32_t cvec_id, const std::string& t, int w, int h, int flag);
+		Window(uint32_t cvec_id, std::string_view t, int w, int h, int flag);
 	 public:
 
 		~Window();

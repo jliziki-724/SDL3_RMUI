@@ -1,6 +1,6 @@
 #include "WindowManager.h"
 
-UIF::Window* UIF::WindowManager::Create(const std::string& t, int w, int h, int flag){
+UIF::Window* UIF::WindowManager::Create(std::string_view t, int w, int h, int flag){
 	Window* window = new Window(CVec_ID++, t, w, h, flag);
 	if(!window->Is_Init()){
 		delete window;
@@ -9,7 +9,7 @@ UIF::Window* UIF::WindowManager::Create(const std::string& t, int w, int h, int 
 	return window;
 }
 
-void UIF::WindowManager::Create_Window(const std::string& title, int w, int h, int flag){	
+void UIF::WindowManager::Create_Window(std::string_view title, int w, int h, int flag){	
 	UIF::Window* Window = Create(title, w, h, flag);
 	if(!Window){ //Simply terminate, no exception.  
 		quit = true;
@@ -149,7 +149,7 @@ void UIF::WindowManager::Query_ID(SDL_WindowID id){
 	}
 }
 
-//No Z-Order, so all components are liable to be hit on a click.
+//No Z-Order, so all overlapping components - i.e non-children - are liable to be hit on a click.
 void UIF::WindowManager::Interact_Window(UIF::Invoker invoker){ 
 	focus_window->Set_Priority(SDL_GetTicks());
 	for(auto* component : this->component_vec[focus_window->Get_CVec_ID()]){
