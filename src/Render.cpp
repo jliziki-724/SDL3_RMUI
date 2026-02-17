@@ -12,9 +12,7 @@ void UIF::Render::Update_Active(UIF::Window* window){
 void UIF::Render::Render_Active(UIF::Window* window){
 	SDL_RenderClear(window->Get_Renderer());
 	for(auto* component : this->component_vec[window->Get_CVec_ID()]){
-		if(component->Is_Active()){
-			component->Render(window);
-		}
+		UIF::Component::Render(window, component);
 	}
 	SDL_RenderPresent(window->Get_Renderer());
 }

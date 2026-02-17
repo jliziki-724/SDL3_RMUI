@@ -17,7 +17,6 @@ void UIF::WindowManager::Create_Window(const std::string& title, int w, int h, i
 	}
 	//Initial Priority for Focus Order for use in event of minimising/maximizing. etc.
 	Window->Set_Priority(SDL_GetTicks());
-	Window->Set_Active(true);
 	this->windows.emplace_back(Window);
 
 	//Window->Components
@@ -29,22 +28,12 @@ void UIF::WindowManager::Create_Window(const std::string& title, int w, int h, i
 }
 
 //Add a component to the target window specified.
-void UIF::WindowManager::Add_Component(UIF::Component* component, const std::string& window){
-	this->component_vec[Query_Title(window)->Get_CVec_ID()].emplace_back(component);
+void UIF::WindowManager::Add_Component(UIF::Component* component, UIF::Window* window){
+	this->component_vec[window->Get_CVec_ID()].emplace_back(component);
 }
 
-void UIF::WindowManager::Remove_Component(UIF::Component* component, const std::string& window){
-	UIF::ContainerTargetEraseAndDelete(component_vec[Query_Title(window)->Get_CVec_ID()], component);
-}
-
-UIF::Window* UIF::WindowManager::Query_Title(const std::string& window){
-	for(auto* win : this->windows){
-		if(win->Get_Title() == window){
-			return win;
-		}
-	}
-
-	return nullptr;
+void UIF::WindowManager::Remove_Component(UIF::Component* component, UIF::Window* window){
+	UIF::ContainerTargetEraseAndDelete(component_vec[window->Get_CVec_ID()], component);
 }
 
 void UIF::WindowManager::Delete_Window(){
@@ -132,7 +121,12 @@ void UIF::WindowManager::Dispatch(){
 }
 
 UIF::Window* UIF::WindowManager::operator[](const std::string& window){
-	return Query_Title(window);
+	for(auto* win : this->windows){
+		if(win->Get_Title() == window){
+			return win;
+		}
+	}
+	return nullptr;
 }
 
 void UIF::WindowManager::Query_Highest_Priority(){
@@ -164,7 +158,7 @@ void UIF::WindowManager::Interact_Window(UIF::Invoker invoker){
 };
 
 void UIF::WindowManager::Component_Event(UIF::Component* component, UIF::Invoker invoker){  
- 	 //Force a Hit on all Components on RESIZE.
+ 	 //Force a Hit on all Components on RESIZE. Handled by HelperMgr
 	if(invoker == UIF::Invoker::RESIZE){
 		for(auto* component : component_vec[focus_window->Get_CVec_ID()]){
 			this->helper_mgr.Invoke(component, focus_window, invoker); 	

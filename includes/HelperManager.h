@@ -24,10 +24,15 @@ namespace UIF{
 		INVOKER_COUNT
 	};
 
+	struct ArrOfVec{
+		std::array<std::vector<UIF::Helper*>, static_cast<long unsigned int>(UIF::Invoker::INVOKER_COUNT)> arr_vec;
+	};
+
+
 	class HelperManager{
 		private: 
-		
-			std::vector<std::unordered_map<UIF::Invoker, std::vector<UIF::Helper*>>> helper_vec;
+			std::vector<ArrOfVec> helper_vec;
+	
 			//Helper Lookup/List of Helpers 
 			std::unordered_map<std::string, Helper*>lookup_helpers;
 
@@ -61,12 +66,6 @@ namespace UIF{
 			UIF::ScaleFitHelper scalefit_helper { "scale_fit", lookup_helpers };
 			
 			std::vector<UIF::Helper*> invoker_helpers { &default_helper };
-			const std::unordered_map<UIF::Invoker, std::vector<UIF::Helper*>>invoker_defaults {
-				{ UIF::Invoker::HOVER, invoker_helpers }, 
-			 	{ UIF::Invoker::CLICK, invoker_helpers },
-				{ UIF::Invoker::LONG_CLICK, invoker_helpers },
-				{ UIF::Invoker::DOUBLE_CLICK, invoker_helpers },
-				{ UIF::Invoker::RESIZE, invoker_helpers} };
 
 			UIF::Data::NotificationBus notifications;
  

@@ -22,13 +22,12 @@ namespace UIF{
 			uint32_t ID{ Component_ID++ };
 
 			ColoredFRect cfrect{};
-
+			
 			UIF::Component* parent{ nullptr };
 			std::vector<Component*> children;
 
 			//Texture Vector ID
 			uint32_t TVec_ID{};
-
 			//Helpers Vector ID
 			uint32_t HVec_ID{};
 
@@ -75,7 +74,7 @@ namespace UIF{
 			//Would be static if didn't require 'this', slightly awkward call site.
 			static void Render(UIF::Window* window, UIF::Component* component);
 			static void Delete(UIF::Component* component);
-			UIF::Component* Query_Hit(UIF::Component* component);	
+			UIF::Component* Query_Hit(UIF::Component* component = nullptr);
 			virtual void Update(UIF::Window* window) = 0; //Update Layout/Geometry
 		
 
@@ -84,18 +83,15 @@ namespace UIF{
 		        UIF::Component* Add_Child(UIF::Component* component);
 			UIF::Component* Remove_Child(UIF::Component* component);
 
-
-			void Mod_Dst(UIF::Window* window, float x, float y, float w, float h);
-			void Mod_Src(float x, float y, float w, float h);
-			void Mod_Color(SDL_Color& RGBA, int16_t r, int16_t g, int16_t b);
-			void Mod_Opacity(SDL_Color& RGBA, int16_t a);
+			UIF::Component* Mod_Dst(UIF::Window* window, float x, float y, float w, float h);
+			UIF::Component* Mod_Src(float x, float y, float w, float h);
+			UIF::Component* Mod_Color(int16_t r, int16_t g, int16_t b);
+			UIF::Component* Mod_Opacity(int16_t a);
 			
-			void Link_To_Texture(UIF::Component* lhs, UIF::Component* rhs);
+			UIF::Component* Link_To_Texture(UIF::Component* component);
 
-
-			//Frequently accessed attributes. Return by Copy instead...
-			const float& Get_Aspect();
-			const float& Get_WinRatio();
+			float Get_Aspect();
+			float Get_WinRatio();
 			const ColoredFRect& Get_CFRect();
 			
 			uint32_t Get_ID();
@@ -108,6 +104,8 @@ namespace UIF{
 
 			void Set_Active(bool new_active);
 			bool Is_Active();
+
+			const std::vector<UIF::Component*>& Get_Children();
 		};
 
 	        class Image : public Component{
@@ -198,7 +196,19 @@ namespace UIF{
 		
 		};
 
-		class TabBar : public Component{
+		class Tab : public Component{
+			private:
+				using Component::Component;
+
+			public:
+			
+				virtual void Update(UIF::Window* window) override{
+				}
+
+	
+		};
+
+		class TabBarContainer : public Component{
 			private:
 				using Component::Component;
 				
@@ -206,23 +216,10 @@ namespace UIF{
 				const float tab_height{};
 
 				float tabs_x{};
-				float tabs_y{}; // <-  
+				float tabs_y{}; 
 
 			public:
-				void Init(UIF::Window* window, float x, float y, float w, float h){
-					static auto calc_space = [this, &x, w](){
-						int counter{};
-
-						if(!counter){
-							return x;
-						}
-						return (++x + (++counter * w));
-					};
-
-					for(auto* child : children){
-						child->Mod_Dst(window, calc_space(), y, w, h);
-					}
-				}
+				void Init(UIF::Window* window, float x, float y, float w, float h, int count);
 
 				void Add_Tab(){
 				}

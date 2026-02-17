@@ -32,7 +32,6 @@ namespace UIF{
 		void Query_ID(SDL_WindowID id);
 		void Query_Highest_Priority();
 
-		UIF::Window* Query_Title(const std::string& title);
  	public:
 		static Window* Create(const std::string& t, int w, int h, int flag);
 
@@ -40,8 +39,8 @@ namespace UIF{
 		~WindowManager() = default; // <- Considered cleaning up abnormal terminations... However, OS reclaims resources anyways.
 
 		void Create_Window(const std::string& title, int w, int h, int flag = SDL_WINDOW_RESIZABLE);
-		void Add_Component(UIF::Component* component, const std::string& window);  
-		void Remove_Component(UIF::Component* component, const std::string& window);
+		void Add_Component(UIF::Component* component, UIF::Window* window);  
+		void Remove_Component(UIF::Component* component, UIF::Window* window);
 		void Run();                
      
 		UIF::Window* operator[](const std::string& window);

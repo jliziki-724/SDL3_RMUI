@@ -25,7 +25,7 @@ namespace UIF{
 		const uint32_t CVec_ID{};
 		const std::string& title{};
 
-		bool is_active{};
+		bool is_active{ true };
 		bool Is_Init() const;
 
 		void Set_Priority(uint64_t t_stamp);

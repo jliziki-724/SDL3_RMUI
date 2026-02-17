@@ -1,6 +1,7 @@
 #ifndef UIFCORE_H
 #define UIFCORE_H
 
+#include <array>
 #include <typeinfo>
 #include <memory>
 #include <limits>
@@ -39,7 +40,8 @@ namespace UIF{
 	class RadioButton;
 	class SideBar;
 	class ScrollBar;
-	class TabBar;
+	class Tab;
+	class TabBarContainer;
 	class TextSurface;
 	class Image;
 	class ToolTip;
@@ -130,6 +132,7 @@ namespace UIF{
 	enum class Invoker;
 	struct Dimensions;
 	struct ColoredFRect;
+	struct ArrOfVec;
 
 	namespace Data{
 		enum class Recipient;

@@ -17,7 +17,7 @@ UIF::Component::Component(const std::string& filepath, UIF::Window* window, floa
 		(static_cast<float>(window->Get_Dimensions().w) * static_cast<float>(window->Get_Dimensions().h)); // <- Capture the initial relative area for use as a Max/Min scaling constraint..
 	
 	//If component is larger than the window. Fit to Window (or workspace in future), recalculate the ratio which should now be 1:1.
-	if(this->win_ratio > 1){
+	if(this->win_ratio > 1.0f){
 		Mod_Dst(window, this->cfrect.dst_frect->x, this->cfrect.dst_frect->y, 
 			static_cast<float>(window->Get_Dimensions().w),
 			static_cast<float>(window->Get_Dimensions().h));
@@ -46,6 +46,7 @@ UIF::Component::Component(UIF::Component* component){
 	UIF::Data::global_bus->Add_ComponentLine(this);
 }
 
+//Even more DFS...
 void UIF::Component::Delete(UIF::Component* component){
 	for(auto* child : component->children){
 			Delete(child);
@@ -69,7 +70,7 @@ void UIF::Component::Render(UIF::Window* window, UIF::Component* component){
 		return true;
 	};
 
-	auto render_cfrect = [&cached, &cache_render](SDL_Color& last_color, UIF::Component* component){
+	static auto render_cfrect = [&cached, &cache_render](SDL_Color& last_color, UIF::Component* component){
 		if(!cached(last_color, component->cfrect.RGBA)){
 			SDL_SetRenderDrawColor(cache_render, component->cfrect.RGBA.r, component->cfrect.RGBA.g, component->cfrect.RGBA.b, component->cfrect.RGBA.a);
 		}
@@ -85,14 +86,12 @@ void UIF::Component::Render(UIF::Window* window, UIF::Component* component){
 		SDL_RenderTexture(cache_render, tex_cache->Get_Texture(component), &component->cfrect.src_frect, component->cfrect.dst_frect);
 	}
 	for(auto* child : component->children){	
-		if(child->Is_Active()){
-			if(!child->TVec_ID){
-				render_cfrect(last_color, child);
+		if(!child->TVec_ID){
+			render_cfrect(last_color, child);
 			
-			}
-			else{
-				SDL_RenderTexture(cache_render, tex_cache->Get_Texture(child), &child->cfrect.src_frect, child->cfrect.dst_frect); 
-			}
+		}
+		else{
+			SDL_RenderTexture(cache_render, tex_cache->Get_Texture(child), &child->cfrect.src_frect, child->cfrect.dst_frect); 
 		}
 		Render(window, child);
 	}
@@ -100,7 +99,7 @@ void UIF::Component::Render(UIF::Window* window, UIF::Component* component){
 
 //Depth First Search. If Component hit, check children... And so forth for all hit components... then return the hit child with no children.
 UIF::Component* UIF::Component::Query_Hit(UIF::Component* component){
-	auto hit_test = [](UIF::Component* component){
+	static auto hit_test = [](UIF::Component* component){
  		float m_x{};
   		float m_y{};
 		SDL_GetMouseState(&m_x, &m_y);
@@ -130,56 +129,67 @@ UIF::Component* UIF::Component::Query_Hit(UIF::Component* component){
 	return this;
 }
 
-void UIF::Component::Mod_Src(float x, float y, float w, float h){
+
+
+UIF::Component* UIF::Component::Mod_Src(float x, float y, float w, float h){
 	if(x < 0 || x > tex_cache->Get_Texture(this)->w ||
 	   y < 0 || y > tex_cache->Get_Texture(this)->h ||
 	   w < 1 || 
 	   h < 1 ){
-		return;
+		return nullptr;
 	}
 	this->cfrect.src_frect.x = x;
 	this->cfrect.src_frect.y = y;
 
 	this->cfrect.src_frect.w = w;
 	this->cfrect.src_frect.h = h;
+
+	return this;
 }
 
-void UIF::Component::Mod_Dst(UIF::Window* window, float x, float y, float w, float h){
+UIF::Component* UIF::Component::Mod_Dst(UIF::Window* window, float x, float y, float w, float h){
 	if(x < 0 || x > window->Get_Dimensions().w ||
 	   y < 0 || y > window->Get_Dimensions().h ||
 	   w < 1 || 
 	   h < 1 ){
-		return;
+		return nullptr;
 	}
 	this->cfrect.dst_frect->x = x;
 	this->cfrect.dst_frect->y = y;
 
 	this->cfrect.dst_frect->w = w;
 	this->cfrect.dst_frect->h = h;
+
+	return this;
 }
 
-void UIF::Component::Mod_Color(SDL_Color& RGBA, int16_t r, int16_t g, int16_t b){
+UIF::Component* UIF::Component::Mod_Color(int16_t r, int16_t g, int16_t b){
 	//Detect Overflow in either direction.
 	if( static_cast<float>(r + g + b) / 
 			static_cast<float>(std::numeric_limits<uint8_t>::max()) > 1 
 			|| (r * g * b) < 0){
-		return;
+		return nullptr;
 	}
-	RGBA.r = static_cast<uint8_t>(r);
-	RGBA.g = static_cast<uint8_t>(g);
-	RGBA.b = static_cast<uint8_t>(b);
+	this->cfrect.RGBA.r = static_cast<uint8_t>(r);
+	this->cfrect.RGBA.g = static_cast<uint8_t>(g);
+	this->cfrect.RGBA.b = static_cast<uint8_t>(b);
+
+	return this;
 }
 
-void UIF::Component::Mod_Opacity(SDL_Color& RGBA, int16_t a){
+UIF::Component* UIF::Component::Mod_Opacity(int16_t a){
 	if(a > std::numeric_limits<uint8_t>::max() 
 			|| a < 0){
-		return;
+		return nullptr;
 	}
-	RGBA.a = static_cast<uint8_t>(a);	
+	this->cfrect.RGBA.a = static_cast<uint8_t>(a);
+
+	return this;
 }
 
-void UIF::Component::Link_To_Texture(UIF::Component* lhs, UIF::Component* rhs){
-	lhs->Set_TVec_ID(rhs->Get_TVec_ID());
+UIF::Component* UIF::Component::Link_To_Texture(UIF::Component* component){
+	this->TVec_ID = component->Get_TVec_ID();
+	return this;
 }
 
 void UIF::Component::Set_TVec_ID(uint32_t new_tvec_id){
@@ -214,12 +224,16 @@ const UIF::ColoredFRect& UIF::Component::Get_CFRect(){
 	return this->cfrect;
 };
 
-const float& UIF::Component::Get_Aspect(){
+float UIF::Component::Get_Aspect(){
 	return this->aspect;
 }
 
-const float& UIF::Component::Get_WinRatio(){
+float UIF::Component::Get_WinRatio(){
 	return this->win_ratio;
+}
+
+const std::vector<UIF::Component*>& UIF::Component::Get_Children(){
+	return this->children;
 }
 
 //Component can be invalid, if and only if it is expressly desired to be asset based.
@@ -260,4 +274,21 @@ UIF::Component* UIF::Component::Remove_Child(UIF::Component* component){
 
 //DERVIED CLASS - DEFINITIONS
 
+void UIF::TabBarContainer::Init(UIF::Window* window, float x, float y, float w, float h, int count){
+	static auto calc_space = [this, &x, w](){
+	int counter{};
 
+	if(!counter){
+		return x;
+	}
+	return (x + (++counter * w) + 5);
+	};
+
+	for(int idx{}; idx < count; idx++){
+		 children.emplace_back(UIF::Component::Create<UIF::Tab>("", window, x, y, w, h));
+	}
+
+	for(auto* child : children){
+		child->Mod_Dst(window, calc_space(), y, w, h);
+	}
+}
