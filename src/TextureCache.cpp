@@ -14,6 +14,8 @@ SDL_Texture* UIF::TextureCache::Get_Texture(UIF::Component* component){
 
 bool UIF::TextureCache::Add_Texture(const std::string& filepath, UIF::Window* window, UIF::Component* component){
 	//Texture hasn't already been loaded.
+	//
+
 	if(!this->redirect_lookup[filepath]){
 		SDL_Surface* temp_surface = IMG_Load(filepath.c_str());
 		if(!temp_surface){
@@ -29,7 +31,7 @@ bool UIF::TextureCache::Add_Texture(const std::string& filepath, UIF::Window* wi
 			SDL_Log("Failed to create texture. SDL error%s\n", SDL_GetError());
  			return false;
 		}
-					
+				
 		this->textures.emplace_back(texture);
 		this->redirect_lookup[filepath] = static_cast<uint32_t>(textures.size() - 1);
 		component->Set_TVec_ID(static_cast<uint32_t>(textures.size() - 1));

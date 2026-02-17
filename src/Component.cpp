@@ -78,7 +78,6 @@ void UIF::Component::Render(UIF::Window* window, UIF::Component* component){
 				component->cfrect.dst_frect);
 	};
 
-
 	if(component->TVec_ID == UIF::TextureCache::NO_TEXTURE){
 		render_cfrect(last_color, component);
 	}
@@ -125,8 +124,7 @@ UIF::Component* UIF::Component::Query_Hit(UIF::Component* component){
 		}
 	}
 
-	//No children hit, hit parent.
-	return this;
+	return component;
 }
 
 

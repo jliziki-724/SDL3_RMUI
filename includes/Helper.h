@@ -27,8 +27,8 @@ namespace UIF
 
 	class Helper{
 		protected:
-		 	Helper(UIF::HelperType helper_type, std::array<UIF::Helper*, static_cast<long unsigned int>(UIF::HelperType::HELPER_COUNT)>& h ){ 
-				h[static_cast<int>(helper_type)] = this;
+		 	Helper(UIF::HelperType helper_type, std::array<UIF::Helper*, static_cast<long unsigned int>(UIF::HelperType::HELPER_COUNT)>& helper_arr ){ 
+				helper_arr[static_cast<int>(helper_type)] = this;
 			}
 		public:
        			virtual void Execute(UIF::Component* component, UIF::Window* window) = 0;	

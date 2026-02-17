@@ -9,7 +9,7 @@
 namespace UIF{
 
 	struct ColoredFRect{
-		SDL_FRect* dst_frect { new SDL_FRect{ 0.0f, 0.0f, 0.0f, 0.0f} };
+		SDL_FRect* dst_frect { new SDL_FRect{} };
 		SDL_FRect src_frect {};
 		SDL_Color RGBA{ 0, 0, 0, SDL_ALPHA_OPAQUE };
 	};
@@ -59,13 +59,16 @@ namespace UIF{
 					//Constructs a deep copy of every copied child resource pointer.
 					for(int idx{}; idx < clone->children.size(); idx++){
 						clone->children[idx] = Clone<T>(clone->children[idx]);
-					}
+					}	
+
 					return clone;
 				}
 
+			//Would be static if didn't require 'this', slightly awkward call site.
 			static void Render(UIF::Window* window, UIF::Component* component);
 			static void Delete(UIF::Component* component);
-			UIF::Component* Query_Hit(UIF::Component* component = nullptr);
+			static UIF::Component* Query_Hit(UIF::Component* component);
+
 			virtual void Update(UIF::Window* window) = 0; //Update Layout/Geometry
 		
 

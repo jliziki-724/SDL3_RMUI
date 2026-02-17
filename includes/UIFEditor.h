@@ -20,13 +20,21 @@ namespace UIFEditor{
 		mgr.Create_Window("UIFEditor", 1280, 720);
 
 		//Assets Here.	
-		auto* f = UIF::Component::Create<UIF::Image>("Assets/582485.jpg", mgr["UIFEditor"], 0, 0, 100, 100)
+		auto* f = UIF::Component::Create<UIF::Image>("Assets/582485.jpg", mgr["UIFEditor"])
 			->Add_Helper(UIF::HelperType::SCALE_UNIFORM, UIF::Invoker::CLICK)
 			->Add_Helper(UIF::HelperType::DRAG, UIF::Invoker::LONG_CLICK);
- 
 
+		auto* g = UIF::Component::Clone<UIF::Image>(f)
+				->Add_Helper(UIF::HelperType::SCALE_UNIFORM, UIF::Invoker::CLICK);
+
+		f->Add_Child(g);
+
+		g->Add_Child(UIF::Component::Clone<UIF::Image>(g)
+				->Add_Helper(UIF::HelperType::SCALE_UNIFORM, UIF::Invoker::CLICK));
+
+
+	
 		mgr.Add_Component(f, mgr["UIFEditor"]);
-
 
 		mgr.Run();
 

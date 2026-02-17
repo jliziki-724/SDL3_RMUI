@@ -125,6 +125,7 @@ UIF::Window* UIF::WindowManager::operator[](const std::string& window){
 			return win;
 		}
 	}
+	std::cout << "Typo" << "\n";
 	return nullptr;
 }
 
@@ -147,7 +148,8 @@ void UIF::WindowManager::Query_ID(SDL_WindowID id){
 		}
 	}
 }
-	                 
+
+//No Z-Order, so all components are liable to be hit on a click.
 void UIF::WindowManager::Interact_Window(UIF::Invoker invoker){ 
 	focus_window->Set_Priority(SDL_GetTicks());
 	for(auto* component : this->component_vec[focus_window->Get_CVec_ID()]){
@@ -181,7 +183,7 @@ void UIF::WindowManager::Component_Event(UIF::Component* component, UIF::Invoker
   	};
 
 	if(hit_test()){
-		this->helper_mgr.Invoke(component->Query_Hit(component),focus_window, invoker);
+		this->helper_mgr.Invoke(UIF::Component::Query_Hit(component),focus_window, invoker);
 	}
 }
 
