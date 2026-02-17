@@ -63,7 +63,6 @@ namespace UIF{
 					return clone;
 				}
 
-			//Would be static if didn't require 'this', slightly awkward call site.
 			static void Render(UIF::Window* window, UIF::Component* component);
 			static void Delete(UIF::Component* component);
 			UIF::Component* Query_Hit(UIF::Component* component = nullptr);
