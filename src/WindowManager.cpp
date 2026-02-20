@@ -1,5 +1,10 @@
 #include "WindowManager.h"
 
+UIF::WindowManager::WindowManager(){
+	//Create a sentinel window to use as a fallback when a window is minimized without any other windows active.
+	Create_Window("", 0, 0, SDL_WINDOW_UTILITY | SDL_WINDOW_HIDDEN | SDL_WINDOW_MINIMIZED);  
+}
+
 UIF::Window* UIF::WindowManager::Create(std::string_view t, int w, int h, int flag){
 	Window* window = new Window(CVec_ID++, t, w, h, flag);
 	if(!window->Is_Init()){
@@ -7,6 +12,30 @@ UIF::Window* UIF::WindowManager::Create(std::string_view t, int w, int h, int fl
 		return nullptr;
 	}	
 	return window;
+}
+
+int UIF::WindowManager::Recalculate_Partition_Size(UIF::Window* window){
+	window->Set_Partition_Size( (window->Get_Dimensions().w * window->Get_Dimensions().h) /
+					window->Get_Total_Partitions());
+}
+
+void UIF::WindowManager::Assign_To_Partitions(UIF::Component* component){
+	//Take Component dimensions
+	//Check which partitions it intersects.
+	//Allocate them to the partitions.
+	
+	//Start partition, on the X/Y axis
+	component->Get_CFRect().dst_frect->x / focus_window->Get_Partition_Size()
+        //End partition on the X axis
+	(component->Get_CFRect().dst_frect->x + component->Get_CFRect().dst_frect->w) / focus_window->Get_Partition_Size(); //
+
+
+	//End partition on the Y axis
+	(component->Get_CFRect().dst_frect->y + component->Get_CFRect().dst_frect->h) / focus_window->Get_Partition_Size();
+
+	for(int idx{}; idx < this->focus_window->Get_Partitions().size(); idx++){
+
+	}
 }
 
 void UIF::WindowManager::Create_Window(std::string_view title, int w, int h, int flag){	
@@ -81,8 +110,8 @@ void UIF::WindowManager::Dispatch(){
 				break;
 
 			case SDL_EVENT_WINDOW_OCCLUDED:
-				//Query_ID(this->event.window.windowID);
-				//Throttle_Frame_Rate(this->focus_window); <-Revisit
+				Query_ID(this->event.window.windowID);
+				Adjust_Frame_Rate(this->focus_window, UIF::FRAME_RATE::_50FPS);
 				break;
 
 			case SDL_EVENT_WINDOW_RESIZED:
@@ -101,6 +130,8 @@ void UIF::WindowManager::Dispatch(){
 				break;
 
 			case SDL_EVENT_WINDOW_MINIMIZED:
+				Query_ID(this->event.window.windowID);
+				focus_window->Set_Active(false);
 				Query_Highest_Priority();
 				break;
 
@@ -127,7 +158,7 @@ UIF::Window* UIF::WindowManager::operator[](const std::string& window){
 			return win;
 		}
 	}
-	std::cout << "Typo" << "\n";
+	std::cout << "Typo" << "\n"; //<-Very robust error detection. Come back later.
 	return nullptr;
 }
 
@@ -189,8 +220,8 @@ void UIF::WindowManager::Component_Event(UIF::Component* component, UIF::Invoker
 	}
 }
 
-void UIF::WindowManager::Throttle_Frame_Rate(UIF::Window* window){
-	window->Set_Frame_Rate(30);
+void UIF::WindowManager::Adjust_Frame_Rate(UIF::Window* window, UIF::FRAME_RATE frame_rate){
+	window->Set_Frame_Rate( static_cast<int>(frame_rate));
 }
 
 void UIF::WindowManager::Run(){

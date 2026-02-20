@@ -39,6 +39,14 @@ SDL_Window* UIF::Window::Get_Window(){
     return this->window;
 }
 
+int UIF::Window::Get_Partition_Size(){
+	return this->partition_size;
+}
+
+int UIF::Window::Get_Total_Partitions(){
+	return this->total_partitions;
+}
+
 int UIF::Window::Get_Frame_Rate(){
 	return this->frame_rate;
 }
@@ -65,6 +73,14 @@ SDL_WindowID UIF::Window::Get_ID(){
 
 const std::string& UIF::Window::Get_Title(){
 	return this->title;
+}
+
+void UIF::Window::Set_Partition_Size(int new_partition_size){
+	this->partition_size = new_partition_size;
+}
+
+void UIF::Window::Set_Total_Partitions(int new_total_partitions){
+	this->total_partitions = new_total_partitions;
 }
 
 void UIF::Window::Set_Active(bool new_active){

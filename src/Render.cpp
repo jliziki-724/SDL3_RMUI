@@ -38,6 +38,13 @@ void UIF::Render::Render_Present(const std::vector<UIF::Window*>& windows){
 		}
 	}
 }
+ 
+void UIF::Render::Disable_Draw(UIF::Component* component){
+	for(auto* child : component->Get_Children()){
+		Disable_Draw(child);
+		component->Set_Draw(false);
+	}
+}
 
 //Another DFS... Render Component(Parent) first, then render the child, then Render the child's children... And so forth.
 void UIF::Render::Render_Update(UIF::Window* window, UIF::Component* component = nullptr){
@@ -61,7 +68,7 @@ void UIF::Render::Render_Update(UIF::Window* window, UIF::Component* component =
 		SDL_RenderFillRect(cache_render, 
 				component->Get_CFRect().dst_frect);
 	};
-
+	//Skip Parent Draw, Query if Children.
 	if(component->Need_Draw()){
 		if(component->Get_TVec_ID() == UIF::TextureCache::NO_TEXTURE){
 			render_cfrect(last_color, component);
@@ -79,8 +86,8 @@ void UIF::Render::Render_Update(UIF::Window* window, UIF::Component* component =
 			else{
 				SDL_RenderTexture(cache_render, tex_cache->Get_Texture(child), &child->Get_CFRect().src_frect, child->Get_CFRect().dst_frect); 
 			}
-			Render_Update(window, child);
 		}
+		Render_Update(window, child);
 	}
 }
 

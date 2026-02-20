@@ -19,6 +19,7 @@ namespace UIF{
 			void Update(const std::vector<UIF::Window*>& component_vec);
 			//Re-Use this later to handle occluded Components or Disappearing Elements.
 			void Update_Draw(const std::vector<UIF::Window*>& windows);
+			void Disable_Draw(UIF::Component* component);
 			void Render_Update(UIF::Window* window, UIF::Component* component);
 			void Render_Feed(UIF::Window* window);
 			void Render_Present(const std::vector<UIF::Window*>& windows);

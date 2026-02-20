@@ -53,7 +53,7 @@ void UIF::Component::Delete(UIF::Component* component){
 }
 
 
-//Depth First Search. If Component hit, check children... And so forth for all hit components... then return the hit child with no children.
+//Depth First Search. If Component hit, it check its children... And so forth for all hit components... then return the hit child with no children.
 UIF::Component* UIF::Component::Query_Hit(UIF::Component* component){
 	auto hit_test = [](UIF::Component* component){
  		float m_x{};

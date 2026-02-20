@@ -8,10 +8,6 @@ namespace UIF{
 
 	/*WindowManager owns all Windows and associated Components.*/
 
-	struct ArrOfCVec{
-		std::array<std::vector<UIF::Component*>, static_cast<long unsigned int>(UIF::Invoker::INVOKER_COUNT)> arr_vec;
-	};
-
 	class WindowManager{
 	 private:
 		inline static uint32_t CVec_ID{};
@@ -19,12 +15,6 @@ namespace UIF{
 		std::vector<UIF::Window*>windows; 
 		std::vector<std::vector<UIF::Component*>>component_vec{};
  
-		static constexpr int total_partitions{ 8 };
-		int partition_size{};
-		std::vector<UIF::ArrOfCVec> window_partitions;
-		//Window_ID->Window's Regions->Region's Components
-
-
 		UIF::Window* focus_window{ nullptr };
 		UIF::HelperManager helper_mgr{};
 		UIF::Render renderer { component_vec };
@@ -33,13 +23,15 @@ namespace UIF{
 
 		SDL_Event event;
 
+		int Recalculate_Partition_Size(UIF::Window* window);
+
 		void Dispatch();
 		void Update();
 		void Render();
 
 		void Partition_Windows();
-
-		void Throttle_Frame_Rate(UIF::Window* window);
+		void Assign_To_Partitions(UIF::Component* component);
+		void Adjust_Frame_Rate(UIF::Window* window, UIF::FRAME_RATE frame_rate);
 
 		void Delete_Window();
 		void Interact_Window(UIF::Invoker invoker);
@@ -50,7 +42,7 @@ namespace UIF{
  	public:
 		static Window* Create(std::string_view t, int w, int h, int flag);
 
-		WindowManager() = default;
+		WindowManager();
 		~WindowManager() = default; // <- Considered cleaning up abnormal terminations... However, OS reclaims resources anyways.
 
 		void Create_Window(std::string_view title, int w, int h, int flag = SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
